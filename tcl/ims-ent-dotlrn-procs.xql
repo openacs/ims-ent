@@ -86,6 +86,11 @@
       where start_date >= :start_date
       and end_date <= :end_date
       order by end_date DESC
+      UNION
+      select term_id
+      from dotlrn_terms
+      where end_date >= now()
+      order by end_date DESC
       limit 1
     </querytext>
   </fullquery>

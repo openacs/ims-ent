@@ -143,7 +143,6 @@ ad_proc -public ims_enterprise::parser::group_to_dotlrn {
 			set parent_key [xml_get_child_node_content_by_path $parent_node {{ sourcedid id } }]
 		    }
 
-
 		}
 
 		set parent_key [string trim $parent_key]
@@ -253,17 +252,11 @@ ad_proc -private ims_enterprise::parser::membership_to_dotlrn {
 
 	set group_source $source
 
-	# temp regsub till quio fix the document
-	# regsub {(,).*} $id {} id
-
 	foreach member_node [xml_node_get_children_by_name $mem_node "member"] {
 
 	    set sourcedidtype [xml_get_child_node_attribute_by_path $member_node {sourcedid} "sourcedidtype"]
 	    set id [xml_get_child_node_content_by_path $member_node { { sourcedid id } }]
 	    set source [xml_get_child_node_content_by_path $member_node { { sourcedid source } }]
-
-	    # idtype *must* be 1, probably need to put a check here (roc)
-	    set idtype [xml_get_child_node_content_by_path $member_node { { idtype } }]
 
 	    # .LRN right now only allows you to assing one specific
 	    # role for a given relation between a user and a class so
