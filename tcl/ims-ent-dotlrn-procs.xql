@@ -81,16 +81,16 @@
 
   <fullquery name="ims_enterprise::ims_dotlrn::groups::guess_term.get_best_term">
     <querytext>
-      select term_id
+      (select term_id
       from dotlrn_terms
       where start_date >= :start_date
       and end_date <= :end_date
-      order by end_date DESC
+      order by end_date DESC)
       UNION
-      select term_id
+      (select term_id
       from dotlrn_terms
       where end_date >= now()
-      order by end_date DESC
+      order by end_date DESC)
       limit 1
     </querytext>
   </fullquery>
