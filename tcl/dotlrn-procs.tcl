@@ -47,7 +47,7 @@ ad_proc -private ims_enterprise::dotlrn::register {
     # Also, register the carnet (username) only for this very first
     # time (roc) !!!!!!!
 
-    db_dml register_id { insert into user_id_member_field_map (user_id, field_name, field_value) values (:user_id, :user_info(field_name), :username) }
+    db_dml register_id { insert into ug_user_id_member_field_map (user_id, field_name, field_value) values (:user_id, :user_info(field_name), :username) }
 
     db_dml update_passwd { update users set password = :userPassword, salt = '' where user_id = :user_id }
 
@@ -77,7 +77,7 @@ ad_proc -private ims_enterprise::dotlrn::get_user_id {
 #    return
 
     set user_id [db_string get_user_id {
-	select user_id from user_id_member_field_map where field_value = :ims_id
+	select user_id from ug_user_id_member_field_map where field_value = :ims_id
     } -default "" ]
 
     if [empty_string_p $user_id] {
@@ -88,7 +88,7 @@ ad_proc -private ims_enterprise::dotlrn::get_user_id {
 #	auth::authentication::Authenticate -authority_id $authority_id -username $ims_id -password $ims_id
 
 	set user_id [db_string get_user_id {
-	    select user_id from user_id_member_field_map where field_value = :ims_id
+	    select user_id from ug_user_id_member_field_map where field_value = :ims_id
 	} -default "" ]
     }
 
