@@ -10,9 +10,9 @@ ad_library {
     @cvs-id $Id$
 }
 
-namespace eval auth {}
+namespace eval ims_enterprise::apm_callback {}
 
-ad_proc -private ims_enterprise::package_upgrade {
+ad_proc -private ims_enterprise::apm_callback::package_install {
 } {
      this will upgrade existing related SC from acs-authentication
     

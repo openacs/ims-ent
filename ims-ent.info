@@ -16,7 +16,7 @@
         <provides url="ims-ent" version="0.1a"/>
 
         <callbacks>
-            <callback type="after-install"  proc="ims_enterprise::package_upgrade"/>
+            <callback type="after-install"  proc="ims_enterprise::apm_callback::package_install"/>
         </callbacks>
         <parameters>
             <parameter datatype="string"  min_n_values="1"  max_n_values="1"  name="DocumentPath"  description="Full local server path including the name of the file itself."/>
