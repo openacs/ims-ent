@@ -10,10 +10,10 @@ ad_library {
     @cvs-id $Id$
 }
 
-namespace eval ims_enterprise::sync::get_doc::xmlrpc::GetDocument {}
+namespace eval ims_enterprise::sync::get_doc::xml_rpc {}
 
-ad_proc -private ims_enterprise::sync::get_doc::xmlrpc::GetParameters {} {
-    Parameters for HTTP GetDocument implementation.
+ad_proc -private ims_enterprise::sync::get_doc::xml_rpc::GetParameters {} {
+    Parameters for XML-RPC GetDocument implementation.
 } {
     return {
 	RPCServerURL {The URL of the xml-rpc server, including where the rpc responds.}
@@ -22,7 +22,7 @@ ad_proc -private ims_enterprise::sync::get_doc::xmlrpc::GetParameters {} {
     }
 }
 
-ad_proc -private ims_enterprise::sync::get_doc::xmlrpc::GetDocument {
+ad_proc -private ims_enterprise::sync::get_doc::xml_rpc::GetDocument {
     parameters
 } {
     Retrieve the document by XML-RPC
