@@ -35,9 +35,12 @@ ad_proc -private ims_enterprise::dotlrn::register {
                         -authority_id $authority_id \
                         -impl_id $impl_id]
 
-    set userPassword [auth::ldap::get_user -username $username -parameters $parameters -element "userPassword"]
+    set userPassword [auth::ldap::get_user -username $ims_id -parameters $parameters -element "userPassword"]
+    if { [llength $search_result] != 1 } {
+	return
+    }
     lappend parameters InfoAttributeMap "first_names=givenName;last_name=sn;email=mail;field_name=userClass"
-    array set info_result [auth::local_ldap::user_info::GetUserInfo $username $parameters]
+    array set info_result [auth::local_ldap::user_info::GetUserInfo $ims_id $parameters]
 
     array set user_info $info_result(user_info)
     set user_id [ad_user_new  $user_info(email) \
