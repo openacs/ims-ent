@@ -3,6 +3,7 @@
 ad_library {
     
     specific library for Galileo University needs
+    Might help as a reference for other users of this pkg
     
     @author Rocael Hernandez Rizzardini (roc@viaro.net)
     @creation-date 2004-06-10
@@ -34,8 +35,18 @@ ad_proc -private ims_enterprise::dotlrn::get_user_id {
     return
 
     set user_id [db_string get_user_id {
-	select user_id from carnets where carnet = :ims_id
+	select user_id from user_id_member_field_map where field_value = :ims_id
     } -default "" ]
+
+    if [empty_string_p $user_id] {
+	# try to authenticate this user (search on ldap & register locally)
+
+	auth::authentication::Authenticate -authority_id $authority_id -username $ims_id -password $ims_id
+
+	set user_id [db_string get_user_id {
+	    select user_id from user_id_member_field_map where field_value = :ims_id
+	} -default "" ]
+    }
 
     return $user_id
 }
@@ -62,7 +73,7 @@ ad_proc -private ims_enterprise::dotlrn::set_carnet_type {
     return
 
     db_dml set_carnet_type {
-	update carnets set type = :roletype
+	update user_id_member_field_map set field_name = :roletype
 	where carnet = :carnet
     }
 }
