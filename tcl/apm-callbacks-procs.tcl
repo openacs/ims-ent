@@ -30,7 +30,8 @@ ad_proc -private ims_enterprise::apm_callback::package_install {
 	ims_enterprise::unregister_impl
 	ims_enterprise::register_impl
 
-	ims_enterprise::get_doc::xml_rpc::register_impl
+#  JCD: this is registered by the before-install callback in the .info file.
+#	ims_enterprise::get_doc::xml_rpc::register_impl
     }
 
 }
