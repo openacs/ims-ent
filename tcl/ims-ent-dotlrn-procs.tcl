@@ -605,7 +605,7 @@ ad_proc -private ims_enterprise::ims_dotlrn::membership::membership {
 	# if the community_id doesn't exist, then its an error
 	if [empty_string_p $community_id] {
 	    set success_p 0
-	    set result(message) "<membership>: A class with this class instance key '$class_instance_key' doesn't exist"		    
+	    set result(message) "<membership>: The community_id $community_id doesn't exist"		    
 	} else {
 
 	    # now lets call the proc defined as param, it must

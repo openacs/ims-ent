@@ -164,10 +164,12 @@ For depatment, subject & class, we use:
 <url>  <--> external_url (just for deps)
 
 
+Aditional notes:
+* It handles snapshot for membership since it do checks now for those persons that do not continue to be members (that are not comming as transactions from the incremental process).
+
 
 Not supported yet:
 * communities
 * sub-groups
 * mapping relation of the type department-->subject-->class using the <membership> tag, we see that this tag is more oriented in the case of a class to a sub-class relation rather than between the ones mentioned (since in .LRN we don't use at all a dep or sub portal). To make a relation between dep-sub-cla use the <relationship relation = "1"> to indicate the parent(1) or child(2).
-* better way to handle snapshot for membership since it do not checks now for those persons that do not continue to be members, but if the incremental process send info about that dropped membership, it will drop it as well.
 * Deal with photos from <person>

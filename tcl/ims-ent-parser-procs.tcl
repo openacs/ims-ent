@@ -252,6 +252,8 @@ ad_proc -private ims_enterprise::parser::membership_to_dotlrn {
 
 	set group_source $source
 
+	set member_list [list]
+
 	foreach member_node [xml_node_get_children_by_name $mem_node "member"] {
 
 	    set sourcedidtype [xml_get_child_node_attribute_by_path $member_node {sourcedid} "sourcedidtype"]
@@ -278,6 +280,23 @@ ad_proc -private ims_enterprise::parser::membership_to_dotlrn {
 		-roletype $roletype \
 		-operation $operation
 
+	    lappend member_list $id
+
+	}
+
+	if {$operation == "snapshot"} {
+	    set non_users_list [db_list get_non_sent_users { *SQL* }]
+	    set member_list [join $member_list ", "]
+	    foreach id $non_users_list {
+		ims_enterprise::ims_dotlrn::membership::membership \
+		    -job_id $job_id \
+		    -class_instance_key $class_instance_key \
+		    -community_id $community_id \
+		    -id $id \
+		    -authority_id $authority_id \
+		    -roletype $roletype \
+		    -operation delete
+	    }
 	}
 
     }
