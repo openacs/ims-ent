@@ -567,6 +567,7 @@ ad_proc -private ims_enterprise::ims_dotlrn::membership::membership {
     {-authority_id:required}
     {-roletype:required}
     {-operation:required}
+    {user_id {}}
 } {
     
     To handle the membership between users & groups from XML IMS Enterprise
@@ -589,6 +590,9 @@ ad_proc -private ims_enterprise::ims_dotlrn::membership::membership {
 
     @param operation
 
+    @param user_id if we get the user_id, will from an snapshot user
+     delete process
+
     @return 
     
     @error 
@@ -602,22 +606,24 @@ ad_proc -private ims_enterprise::ims_dotlrn::membership::membership {
             element_messages {}
         }
 
-	set user_id ""
-
 	# if the community_id doesn't exist, then its an error
 	if [empty_string_p $community_id] {
 	    set success_p 0
 	    set result(message) "<membership>: The community_id $community_id doesn't exist"		    
 	} else {
 
-	    # now lets call the proc defined as param, it must
-	    # return the user_id
+	    if [empty_string_p $user_id] {
 
-	    set proc_name [parameter::get_from_package_key -package_key ims-ent -parameter UserIdReturnProc]
-	    # execute the proc and get the user_id
+		# now lets call the proc defined as param, it must
+		# return the user_id	    
 
-	    set proc_list [list [lindex ${proc_name} 0] [lindex ${proc_name} 1] $id -authority_id $authority_id]
-	    set user_id [eval $proc_list]
+		set proc_name [parameter::get_from_package_key -package_key ims-ent -parameter UserIdReturnProc]
+		# execute the proc and get the user_id
+		
+		set proc_list [list [lindex ${proc_name} 0] [lindex ${proc_name} 1] $id -authority_id $authority_id]
+		set user_id [eval $proc_list]
+
+	    }
 
 	    if { [empty_string_p $user_id] } {
 		# Updating/deleting a user that doesn't exist

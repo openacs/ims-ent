@@ -118,7 +118,7 @@
       select user_id
       from dotlrn_member_rels_full
       where community_id = :community_id
-      and user_id not in (:member_list)
+      and user_id not in ($member_list)
     </querytext>
   </fullquery>
 </queryset>

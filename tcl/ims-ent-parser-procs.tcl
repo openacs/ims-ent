@@ -286,8 +286,8 @@ ad_proc -private ims_enterprise::parser::membership_to_dotlrn {
 	}
 
 	if {$operation == "snapshot"} {
-	    set non_users_list [db_list get_non_sent_users { *SQL* }]
 	    set member_list [join $member_list ", "]
+	    set non_users_list [db_list get_non_sent_users { *SQL* }]
 	    foreach id $non_users_list {
 		ims_enterprise::ims_dotlrn::membership::membership \
 		    -job_id $job_id \
@@ -296,7 +296,7 @@ ad_proc -private ims_enterprise::parser::membership_to_dotlrn {
 		    -id $id \
 		    -authority_id $authority_id \
 		    -roletype $roletype \
-		    -operation delete
+		    -operation delete $id
 	    }
 	}
 
