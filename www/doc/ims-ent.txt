@@ -1,9 +1,11 @@
 IMS-ENT
 Author: Rocael Hernandez (roc@viaro.net), Viaro Networks
+Date: 17-June-2004
 The purpouse of this package is to handle any IMS Enterprise v.1.1 XML document, and reflect all the respective data into .LRN.
 Please read http://imsglobal.org/enterprise/ for more infomation.
+Note: I found this best practice guide:http://www.imsglobal.org/enterprise/entv1p1/imsent_bestv1p1.html
 
-Basically, what the XML will refles is 3 things:
+Basically, what the XML will reflects are 3 things:
 1. Users. <person>
 2. Departments, Subjects and classes (and its relation between them). <group>
 3. Relation between users and classes, and proper roles. <membership>
@@ -11,13 +13,9 @@ Basically, what the XML will refles is 3 things:
 Right now, what ims-ent does is to mimic what the acs-authentication did for #1, but adding also the functionality of #2 & #3.
 
 Parameters:
-UserIdReturnProc this is a proc that must return the user_id, based on: 
-1. the person id that we get from the XML document
-2. the -authority_id $authority_id that we will get from the system (the proc must accept this: -authority_id $authority_id, i.e. acs_user::get_by_username -username, the first param to be sent to the proc is the id form the user)
 
-
-The parameters: department, subject, class should contain the value that tell us if a <group> tag represents one of them. 
-(if a typevalue is not specified / valid one, the parser will not process those <group>)
+The parameters: department, subject, class should contain the value that tell us if a <group> tag represents one of them, look at the examples below. 
+(if a <typevalue level=x> is not specified / valid one, the parser will not process those <group>, must match with some of the parameter values above)
 
 
 i.e. level = 1 for departments
@@ -36,7 +34,7 @@ i.e. level = 1 for departments
   </group>
 
 level = 2 for subjects,
-note: relation = 1 indicates which group is the parent and relation = 2 is not really used by the parser
+note: relation = 1 indicates which group is the parent and relation = 2 is not used by the parser as a first choice
 
   <group recstatus = "1">
     <comments>Add a new class CO205 , SEMINARIO TEORIA DE SISTEMAS I</comments>
@@ -74,7 +72,7 @@ note: relation = 1 indicates which group is the parent and relation = 2 is not r
     ....
   </group>
 
-level = 3 for departments,
+level = 3 for classes,
 
   <group recstatus = "1">
     <comments>Add a new seccion (curso: CO205 , seccion: A)</comments>
@@ -105,6 +103,8 @@ level = 3 for departments,
 
 Note the relation of the class (group) with the its subject (parent group).
 If a relation is not found, it will try to search in the same document for a group that has this group as a child (relation = 2), if not will give you an error.
+Using the <relationship relation = "1 or 2"> you can implement the hierarchy like: Dep-->Sub-->Class (the only hierarchy supported by .LRN now)
+
 
 <MEMBERSHIP>
 
@@ -135,6 +135,10 @@ this is a normal <membership> tag:
 
 (we expect at least this information, which is the only that will be used)
 
+UserIdReturnProc this is a proc that must return the user_id, based on: 
+1. the person id that we get from the XML document
+2. the -authority_id $authority_id that we will get from the system (the proc must accept this: -authority_id $authority_id, i.e. acs_user::get_by_username -username, the first param to be sent to the proc is the id form the user), i.e. by defualt is set --> acs_user::get_by_username -username, which will be called and sent as username the <id> that comes from the XML (by default that <id> is stored in the username when you import users using ims-ent), but you might call another proc that might be useful to get the user_id based on your own needs, for standard use, the default value is good.
+
 Configuration:
 1. Create a new authority, that handle IMS Enteprise (Batch Synchronization Section).
 2. As a sync method you can configure http-get, file system or xml-rpc.
@@ -142,9 +146,12 @@ Configuration:
 4. Now press on: "Run new batch job now" and will import all the data and create the respective stuff (this process might take a bunch of time, depending on how much info do you have).
 
 (Then for each job, you'll get more information about each transaction processed)
+http-get: define a valid URL to grab the XML. (i.e. http://mysite.com/ims-ent-snapshot.xml)
+file system: a local file in your server directories to grab the XML. (i.e. /myfiles/ims-ent/incremental-update.xml)
+xml-rpc: a valid method in a valid RPC host. (i.e. host: http://mysite.com/RPC2   method: IMSEntSnapshot)
 
 What about Terms:
-When creating the terms, will search for the best* term that fits between the dates specified at <timeframe> tag, and will return it, if none fits, will create one automatically with start/end date defined in the document. If not provided <timeframe> tag with start / end date, it will select the term that ends most late.
+When creating the terms, will search for the best* term that fits between the dates specified in the <timeframe> tag, and will return it. If none fits, will create one automatically with start/end date defined in the document. If the <timeframe> tag is  not provided with start / end date, it will select the term that ends most late.
 * by "best" we mean the term that fits the start/end date that ends the later. (though that can be easily changed, see: ims_enterprise::ims_dotlrn::groups::guess_term)
 A lot of rules can be done here, but I wanted to keep it simple so anyone else can easily extend to their needs.
 
