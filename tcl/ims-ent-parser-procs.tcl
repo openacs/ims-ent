@@ -298,6 +298,10 @@ ad_proc -private ims_enterprise::parser::ProcessDocument {
 } {
     Process IMS Enterprise 1.1 document.
 } {
+
+    # be sure that we'll create new users as .LRN users
+    parameter::set_from_package_key -package_key acs-authentication -parameter SyncAddUsersToDotLrnP -value 1
+
     set tree [xml_parse -persist $document]
 
     set root_node [xml_doc_get_first_node $tree]
