@@ -14,6 +14,48 @@ ad_library {
 
 namespace eval ims_enterprise::dotlrn {}
 
+
+#----------------------ug-local-automatic-------------
+
+
+ad_proc -private ims_enterprise::dotlrn::register {
+    {-ims_id:required}
+    {-authority_id:required}
+} {
+
+    set impl_id [auth::authority::get_element -authority_id $authority_id -element "auth_impl_id"]
+
+    if { [empty_string_p $impl_id] } {
+        # No implementation of authentication
+        set authority_pretty_name [auth::authority::get_element -authority_id $authority_id -element "pretty_name"]
+        error "The authority '$authority_pretty_name' doesn't support authentication"
+    }
+
+    set parameters [auth::driver::get_parameter_values \
+                        -authority_id $authority_id \
+                        -impl_id $impl_id]
+
+    set userPassword [auth::ldap::get_user -username $username -parameters $parameters -element "userPassword"]
+    lappend parameters InfoAttributeMap "first_names=givenName;last_name=sn;email=mail;field_name=userClass"
+    array set info_result [auth::local_ldap::user_info::GetUserInfo $username $parameters]
+
+    array set user_info $info_result(user_info)
+    set user_id [ad_user_new  $user_info(email) \
+		     $user_info(first_names)  $user_info(last_name) \
+		     $password  {} {}  {}  1  "approved"  {}  $username  $authority_id  $username]
+
+    # Also, register the carnet (username) only for this very first
+    # time (roc) !!!!!!!
+
+    db_dml register_id { insert into user_id_member_field_map (user_id, field_name, field_value) values (:user_id, :user_info(field_name), :username) }
+
+    db_dml update_passwd { update users set password = :userPassword, salt = '' where user_id = :user_id }
+
+}
+
+#--------------------------------------
+
+
 ad_proc -private ims_enterprise::dotlrn::get_user_id {
     {-ims_id:required}
     {-authority_id:required}
@@ -32,7 +74,7 @@ ad_proc -private ims_enterprise::dotlrn::get_user_id {
     
     @error 
 } {
-    return
+#    return
 
     set user_id [db_string get_user_id {
 	select user_id from user_id_member_field_map where field_value = :ims_id
@@ -41,7 +83,9 @@ ad_proc -private ims_enterprise::dotlrn::get_user_id {
     if [empty_string_p $user_id] {
 	# try to authenticate this user (search on ldap & register locally)
 
-	auth::authentication::Authenticate -authority_id $authority_id -username $ims_id -password $ims_id
+	ims_enterprise::dotlrn::register -ims_id $ims_id -authority_id $authority_id
+
+#	auth::authentication::Authenticate -authority_id $authority_id -username $ims_id -password $ims_id
 
 	set user_id [db_string get_user_id {
 	    select user_id from user_id_member_field_map where field_value = :ims_id
@@ -77,3 +121,4 @@ ad_proc -private ims_enterprise::dotlrn::set_carnet_type {
 	where carnet = :carnet
     }
 }
+
