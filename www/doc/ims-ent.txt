@@ -1,0 +1,166 @@
+IMS-ENT
+Author: Rocael Hernandez (roc@viaro.net), Viaro Networks
+The purpouse of this package is to handle any IMS Enterprise v.1.1 XML document, and reflect all the respective data into .LRN.
+Please read http://imsglobal.org/enterprise/ for more infomation.
+
+Basically, what the XML will refles is 3 things:
+1. Users. <person>
+2. Departments, Subjects and classes (and its relation between them). <group>
+3. Relation between users and classes, and proper roles. <membership>
+
+Right now, what ims-ent does is to mimic what the acs-authentication did for #1, but adding also the functionality of #2 & #3.
+
+Parameters:
+UserIdReturnProc this is a proc that must return the user_id, based on: 
+1. the person id that we get from the XML document
+2. the -authority_id $authority_id that we will get from the system (the proc must accept this: -authority_id $authority_id, i.e. acs_user::get_by_username -username, the first param to be sent to the proc is the id form the user)
+
+
+The parameters: department, subject, class should contain the value that tell us if a <group> tag represents one of them. 
+(if a typevalue is not specified / valid one, the parser will not process those <group>)
+
+
+i.e. level = 1 for departments
+
+  <group recstatus = "1">
+    <comments>Add a new department (carrera : INGENIERIA EN ELECTRONICA, INFORMATICA Y CIENCIAS DE LA COMPUTACION)</comments>
+    <sourcedid>
+      <source>Universidad Galileo</source>
+      <id>IE</id>
+    </sourcedid>
+    <grouptype>
+      <scheme>Universiad Galileo</scheme>
+      <typevalue level = "1" />
+    </grouptype>
+    ....
+  </group>
+
+level = 2 for subjects,
+note: relation = 1 indicates which group is the parent and relation = 2 is not really used by the parser
+
+  <group recstatus = "1">
+    <comments>Add a new class CO205 , SEMINARIO TEORIA DE SISTEMAS I</comments>
+    <sourcedid>
+      <source>Galileo University Database</source>
+      <id>IE___CO205</id>
+    </sourcedid>
+    <grouptype>
+      <scheme>Galileo University</scheme>
+      <typevalue level = "2" />
+    </grouptype>
+    <description>
+      <short>SEMINARIO TEORIA DE SISTEMAS I</short>
+    </description>
+    <org>
+      <orgname>Universidad Galileo</orgname>
+      <orgunit>IE</orgunit>
+      <type>class</type>
+      <id>CO205</id>
+    </org>
+    <relationship relation = "1">
+      <sourcedid>
+        <source>Galileo University Database</source>
+        <id>IE</id>
+      </sourcedid>
+      <label>department</label>
+    </relationship>
+    <relationship relation = "2">
+      <sourcedid>
+        <source>UDB Class CO205, seccion A</source>
+        <id>CO205___A</id>
+	  </sourcedid>
+	  <label>section</label>
+    </relationship>
+    ....
+  </group>
+
+level = 3 for departments,
+
+  <group recstatus = "1">
+    <comments>Add a new seccion (curso: CO205 , seccion: A)</comments>
+    <sourcedid>
+      <source>Universidad Galileo</source>
+      <id>CO205___A</id>
+    </sourcedid>
+    <grouptype>
+      <scheme>Galileo University</scheme>
+      <typevalue level = "3" />
+    </grouptype>
+    <description>
+      <long>SEMINARIO TEORIA DE SISTEMAS I, Seccion A</long>
+    </description>
+    <timeframe>
+      <begin restrict = "1">2004-01-13</begin>
+      <end restrict = "1">2004-06-04</end>
+      <adminperiod>2004-01-13 - 2004-06-04</adminperiod>
+    </timeframe>
+    <relationship relation = "1">
+      <sourcedid>
+        <source>Galileo University Database</source>
+        <id>IE___CO205</id>
+      </sourcedid>
+      <label>class</label>
+    </relationship>
+  </group>
+
+Note the relation of the class (group) with the its subject (parent group).
+If a relation is not found, it will try to search in the same document for a group that has this group as a child (relation = 2), if not will give you an error.
+
+<MEMBERSHIP>
+
+we expect the roletype attribute: <role recstatus="1" roletype="2">
+This is the actual mapping between standard roles defined in the document (http://imsglobal.org/enterprise/entv1p1/imsent_infov1p1.html#1427710) and the ones defined @ .LRN:
+	2 { dotlrn_instructor_rel }
+	7 5 { dotlrn_cadmin_rel }
+	3 { return dotlrn_ca_rel }
+	6 8 { dotlrn_ta_rel }
+	4 1 {  dotlrn_student_rel }
+
+this is a normal <membership> tag:
+  <membership>
+    <sourcedid>
+      <source>Universidad Galileo</source>
+      <id>A3606___A</id>
+    </sourcedid>
+    <member>
+      <sourcedid>
+        <source>Universidad Galileo</source>
+        <id>16001</id>
+      </sourcedid>
+      <role recstatus="1" roletype="2">
+      </role>
+    </member>
+    ......
+  </membership>
+
+(we expect at least this information, which is the only that will be used)
+
+Configuration:
+1. Create a new authority, that handle IMS Enteprise (Batch Synchronization Section).
+2. As a sync method you can configure http-get, file system or xml-rpc.
+3. Now you can: "Configure drivers for this authority" (fill with the appropiate data)
+4. Now press on: "Run new batch job now" and will import all the data and create the respective stuff (this process might take a bunch of time, depending on how much info do you have).
+
+(Then for each job, you'll get more information about each transaction processed)
+
+What about Terms:
+When creating the terms, will search for the best* term that fits between the dates specified at <timeframe> tag, and will return it, if none fits, will create one automatically with start/end date defined in the document. If not provided <timeframe> tag with start / end date, it will select the term that ends most late.
+* by "best" we mean the term that fits the start/end date that ends the later. (though that can be easily changed, see: ims_enterprise::ims_dotlrn::groups::guess_term)
+A lot of rules can be done here, but I wanted to keep it simple so anyone else can easily extend to their needs.
+
+
+Mapping IMS enterprise to .LRN:
+
+For depatment, subject & class, we use:
+<long> <--> pretty_name
+<full> <--> description
+<url>  <--> external_url (just for deps)
+
+
+
+Not supported yet:
+* communities
+* sub-groups
+* mapping relation of the type department-->subject-->class using the <membership> tag, we see that this tag is more oriented in the case of a class to a sub-class relation rather than between the ones mentioned (since in .LRN we don't use at all a dep or sub portal). To make a relation between dep-sub-cla use the <relationship relation = "1"> to indicate the parent(1) or child(2).
+* better way to handle snapshot for membership since it do not checks now for those persons that do not continue to be members, but if the incremental process send info about that dropped membership, it will drop it as well.
+* Deal with photos from <person>
