@@ -102,7 +102,7 @@ ad_proc -private ims_enterprise::get_doc::xml_rpc::register_impl {} {
 
 }
 
-ad_proc -private ims_enterprise::sync::get_doc::xml_rpc::unregister_impl {} {
+ad_proc -private ims_enterprise::get_doc::xml_rpc::unregister_impl {} {
     Unregister this implementation
 } {
     acs_sc::impl::delete -contract_name "auth_sync_retrieve" -impl_name "XMLRPC"
