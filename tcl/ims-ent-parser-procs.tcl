@@ -279,7 +279,9 @@ ad_proc -private ims_enterprise::parser::membership_to_dotlrn {
 			     -roletype $roletype \
 			     -operation $operation]
 
-	    lappend member_list $user_id
+	    if ![empty_string_p $user_id] {
+		lappend member_list $user_id
+	    }
 
 	}
 
