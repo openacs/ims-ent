@@ -276,11 +276,11 @@ ad_proc -private ims_enterprise::parser::membership_to_dotlrn {
 	    set operation [ims_enterprise::ims_dotlrn::recstatus -recstatus $recstatus]
 
 
-	    ims_enterprise::ims_dotlrn::groups::membership \
+	    ims_enterprise::ims_dotlrn::membership::membership \
 		-job_id $job_id \
 		-class_instance_key $class_instance_key \
 		-community_id $community_id \
-		-username $id \
+		-id $id \
 		-authority_id $authority_id \
 		-roletype $roletype \
 		-operation $operation

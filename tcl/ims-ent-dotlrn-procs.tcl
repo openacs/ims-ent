@@ -559,11 +559,11 @@ ad_proc -private ims_enterprise::ims_dotlrn::membership::rel_type {
 }
 
 
-ad_proc -private ims_enterprise::ims_dotlrn::groups::membership {
+ad_proc -private ims_enterprise::ims_dotlrn::membership::membership {
     {-job_id:required}
     {-class_instance_key:required}
     {-community_id:required}
-    {-username:required}
+    {-id:required}
     {-authority_id:required}
     {-roletype:required}
     {-operation:required}
@@ -580,7 +580,8 @@ ad_proc -private ims_enterprise::ims_dotlrn::groups::membership {
 
     @param community_id
 
-    @param username
+    @param id ID that's is comming at IMS XML doc, which identify a
+     given user in our system (ins't the user_id, but we'll use it for getting it)
 
     @param authority_id
 
@@ -607,28 +608,27 @@ ad_proc -private ims_enterprise::ims_dotlrn::groups::membership {
 	    set result(message) "<membership>: A class with this class instance key '$class_instance_key' doesn't exist"		    
 	} else {
 
-	    # lets get the user_id (we use the username as key for
-	    # getting the user)
-	    # the user should not be able to change the username! or
-	    # we should store that in another place!
-	    # (roc)
+	    # now lets call the proc defined as param, it must
+	    # return the user_id
 
-	    set user_id [acs_user::get_by_username -authority_id $authority_id -username $username]
+	    set proc_name [parameter::get_from_package_key -package_key ims-ent -parameter UserIdReturnProc]
+	    # execute the proc and get the user_id
+	    set user_id [${proc_name} $id -authority_id $authority_id]
 
 	    if { [empty_string_p $user_id] } {
 		# Updating/deleting a user that doesn't exist
 		set success_p 0
-		set result(message) "A user with username '$username' does not exist"
+		set result(message) "A user with id '$id' does not exist"
 	    } else {
 		acs_user::get -user_id $user_id -array existing_user_info
 		if { [string equal $existing_user_info(member_state) "banned"] } {
 		    # Updating/deleting a user that's already deleted
 		    set success_p 0
-		    set result(message) "The user with username '$username' has been deleted (banned)"
+		    set result(message) "The user with id '$id' has been deleted (banned)"
 		} elseif ![dotlrn::user_p -user_id $user_id] {
 		    # This is not a dotlrn user
 		    set success_p 0
-		    set result(message) "<membership>: The user with username '$username' isn't a dotlrn user"
+		    set result(message) "<membership>: The user with id '$id' isn't a dotlrn user"
                 }	
 	    }
 	}
@@ -651,6 +651,9 @@ ad_proc -private ims_enterprise::ims_dotlrn::groups::membership {
 		    set rel_type [ims_enterprise::ims_dotlrn::membership::rel_type $roletype]
 		
 		    dotlrn_community::add_user -rel_type $rel_type $community_id $user_id
+
+		    # lets update the given ID type for this user_id
+		    ims_enterprise::dotlrn::set_carnet_type -carnet $id -roletype $roletype
 		}
 		set result(message) "<membership>"
 	    }  {
@@ -666,7 +669,7 @@ ad_proc -private ims_enterprise::ims_dotlrn::groups::membership {
 	set entry_id [ims_enterprise::sync::job::create_entry \
 			  -job_id $job_id \
 			  -operation $operation \
-			  -username $username \
+			  -username $id \
 			  -user_id $user_id \
 			  -community_key $community_id \
 			  -class_instance_key $class_instance_key \
