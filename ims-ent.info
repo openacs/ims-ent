@@ -14,6 +14,7 @@
         <vendor url="www.galileo.edu">Galileo University</vendor>
 
         <provides url="ims-ent" version="0.1a"/>
+        <requires url="dotlrn" version="2.0.3"/>
 
         <callbacks>
             <callback type="after-install"  proc="ims_enterprise::apm_callback::package_install"/>
