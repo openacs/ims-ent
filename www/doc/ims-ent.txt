@@ -142,7 +142,7 @@ UserIdReturnProc this is a proc that must return the user_id, based on:
 Configuration:
 1. Create a new authority, that handle IMS Enteprise (Batch Synchronization Section).
 2. As a sync method you can configure http-get, file system or xml-rpc.
-3. Now you can: "Configure drivers for this authority" (fill with the appropiate data)
+3. Now you can: "Configure drivers for this authority" (fill with the appropriate data)
 4. Now press on: "Run new batch job now" and will import all the data and create the respective stuff (this process might take a bunch of time, depending on how much info do you have).
 
 (Then for each job, you'll get more information about each transaction processed)
