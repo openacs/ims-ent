@@ -164,7 +164,7 @@ For depatment, subject & class, we use:
 <url>  <--> external_url (just for deps)
 
 
-Aditional notes:
+Additional notes:
 * It handles snapshot for membership since it do checks now for those persons that do not continue to be members (that are not comming as transactions from the incremental process).
 
 
