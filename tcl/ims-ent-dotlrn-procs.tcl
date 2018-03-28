@@ -581,8 +581,8 @@ ad_proc -private ims_enterprise::ims_dotlrn::membership::membership {
 
     @param community_id
 
-    @param id ID that's is comming at IMS XML doc, which identify a
-     given user in our system (ins't the user_id, but we'll use it for getting it)
+    @param id ID that's coming at IMS XML doc, which identify a
+     given user in our system (isn't the user_id, but we'll use it for getting it)
 
     @param authority_id
 
