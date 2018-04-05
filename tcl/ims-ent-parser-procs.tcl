@@ -33,7 +33,7 @@ ad_proc -public ims_enterprise::parser::group_to_dotlrn {
 
     # Loop over <group> records
     # we'll process <typevalue level=> as:
-    # 1. Deparments
+    # 1. Departments
     # 2. Subjects
     # 3. Class instances
     # these are the defaults, but can be customized as parameters

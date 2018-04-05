@@ -57,18 +57,18 @@ ad_proc -private ims_enterprise::ims_dotlrn::recstatus {
 ad_proc -private ims_enterprise::ims_dotlrn::groups::department_check {
     dep_id
 } {
-     checks if a deparment in .LRN exists
-    
+     checks if a department in .LRN exists
+
     @author Rocael Hernandez Rizzardini (roc@viaro.net)
     @creation-date 2004-04-01
-    
+
     @param dep_id
 
     @return 1 if yes, 0 if not
-    
-    @error 
+
+    @error
 } {
-    
+
     return [db_string get { *SQL* }]
 
 }

@@ -22,9 +22,9 @@
         </callbacks>
         <parameters>
             <parameter datatype="string"  min_n_values="1"  max_n_values="1"  name="UserIdReturnProc"  default="acs_user::get_by_username -username" description="This should be a proc thar MUST return the user_id based on a key that its passed to that proc, the key is the &amp;lt;id&amp;gt; that identify the user through the IMS DTD, and should be unique as well. This proc also will be receiving as param &quot;-authority_id $authority_id&quot;, since everything is related to that. The default will use the username as a key to link IMS and acs-authentication."/>
-            <parameter datatype="number"  min_n_values="1"  max_n_values="1"  name="class"  default="3" description="the value in the xml file for identify the a class level in the group context" section_name="Levels values from grouptype"/>
-            <parameter datatype="number"  min_n_values="1"  max_n_values="1"  name="department"  default="1" description="the value in the xml file for identify the a deparment level in the group context." section_name="Levels values from grouptype"/>
-            <parameter datatype="number"  min_n_values="1"  max_n_values="1"  name="subject"  default="2" description="the value in the xml file for identify the a subject level in the group context" section_name="Levels values from grouptype"/>
+            <parameter datatype="number"  min_n_values="1"  max_n_values="1"  name="class"  default="3" description="the value in the xml file for identifying the class level in the group context" section_name="Levels values from grouptype"/>
+            <parameter datatype="number"  min_n_values="1"  max_n_values="1"  name="department"  default="1" description="the value in the xml file for identifying the department level in the group context." section_name="Levels values from grouptype"/>
+            <parameter datatype="number"  min_n_values="1"  max_n_values="1"  name="subject"  default="2" description="the value in the xml file for identifying the subject level in the group context" section_name="Levels values from grouptype"/>
         </parameters>
 
     </version>
