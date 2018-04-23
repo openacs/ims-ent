@@ -26,7 +26,7 @@ foreach element_name [auth::authority::get_sc_impl_columns] {
     regsub {^.*(_id)$} $element_name {_name} name_column
 
     set impl_params [auth::driver::get_parameters -impl_id $authority($element_name)]
-    
+
     foreach { param_name dummy } $impl_params {
         lappend param_impls($param_name) $authority($element_name)
     }
@@ -36,10 +36,10 @@ foreach element_name [auth::authority::get_sc_impl_columns] {
     array set parameter_values [auth::driver::get_parameter_values \
                                     -authority_id $authority_id \
                                     -impl_id $authority($element_name)]
-    
+
 }
 
-set has_parameters_p [expr [llength [array names parameters]] > 0]
+set has_parameters_p [expr [array size parameters] > 0]
 
 set first_param_name ""
 if { $has_parameters_p } {
@@ -65,7 +65,7 @@ if { $has_parameters_p } {
             }
 
         } -on_submit {
-            
+
             foreach element_name [template::form::get_elements -no_api parameters] {
 
                 # Make sure we have a parameter element
@@ -79,7 +79,7 @@ if { $has_parameters_p } {
                     }
                 }
             }
-            
+
             ad_returnredirect $authority_url
             ad_script_abort
         }
