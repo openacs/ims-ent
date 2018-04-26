@@ -98,7 +98,7 @@ ad_proc -public ims_enterprise::parser::group_to_dotlrn {
 	    # department has no Parent so far, so we won't look for that now
 	    if {$lookup_level != [parameter::get_from_package_key -package_key ims-ent  -parameter department]} {
 
-		set relationships [list]
+		set relationships {}
 	    
 		foreach relationship_node [xml_node_get_children_by_name $group_node "relationship"] {
 		    set relation [xml_node_get_attribute $relationship_node "relation"]
@@ -252,7 +252,7 @@ ad_proc -private ims_enterprise::parser::membership_to_dotlrn {
 
 	set group_source $source
 
-	set member_list [list]
+	set member_list {}
 
 	foreach member_node [xml_node_get_children_by_name $mem_node "member"] {
 
